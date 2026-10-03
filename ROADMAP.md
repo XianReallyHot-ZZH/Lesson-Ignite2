@@ -101,10 +101,10 @@
 ## 8. 进度追踪
 
 - [x] Phase 0：`/setup-matt-pocock-skills`（GitHub Issues / 默认 triage 标签 / single-context domain docs / CLAUDE.md）
-- [ ] Phase A：research #1 启动路径
-- [ ] Phase A：research #2 模块依赖图
-- [ ] Phase A：research #3 数据面主路径
-- [ ] Phase A：research #4 持久化 + SQL
+- [x] Phase A：research #1 启动路径 → `docs/research/01-startup-path.md`（已验收：143 条源码引用 100% 真实）
+- [x] Phase A：research #2 模块依赖图 → `docs/research/02-module-dependency-graph.md`（已验收：45 个 pom 核验，Mermaid 逐边有证据）
+- [x] Phase A：research #3 数据面主路径 → `docs/research/03-data-plane-put-path.md`（已验收：10 步调用链，本地/分布式对照）
+- [x] Phase A：research #4 持久化 + SQL → `docs/research/04-persistence-sql.md`（已验收：持久化四件套 + H2/map-reduce）
 - [ ] Phase B：`/grill-with-docs`（钉死 §5 的范围决策）
 - [ ] Phase B：`/wayfinder`（课程地图）
 - [ ] Phase B：`/to-spec`（课程 spec）
