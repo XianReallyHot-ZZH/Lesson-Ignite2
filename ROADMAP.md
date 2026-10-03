@@ -100,7 +100,7 @@
 
 ## 8. 进度追踪
 
-- [ ] Phase 0：`/setup-matt-pocock-skills`
+- [x] Phase 0：`/setup-matt-pocock-skills`（GitHub Issues / 默认 triage 标签 / single-context domain docs / CLAUDE.md）
 - [ ] Phase A：research #1 启动路径
 - [ ] Phase A：research #2 模块依赖图
 - [ ] Phase A：research #3 数据面主路径
