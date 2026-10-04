@@ -58,29 +58,28 @@
 3. **螺旋式重访**：同一对象以递增深度重现——cache 依次经历 本地并发 → 分布式分区 → 事务 → 持久化 → SQL 索引。
 4. **每课验收 = 测试全绿 + 与真 Ignite 行为对比**：尽量改写 Ignite 自己的（Apache 2.0）测试作为验收标准。
 
-## 4. 课程骨架 v1（2026-10-03 grill 定稿，交由 wayfinder 切课）
+## 4. 课程地图 v1（wayfinder 定稿，2026-10-04）
 
-切课纪律：**认知负担优先、学习曲线平滑**（§3.2）——骨架只定章节顺序与每章概念簇，课的粒度由 wayfinder 按"每课一个新概念簇 + 2–4h agent 预算"反推；总课数不预设（30–50 仅作锚）。
+**完整课表（97 主课 + 1 选做）见 [docs/course-map-v1.md](docs/course-map-v1.md)**——总课表、章间依赖 DAG、kernal 终态对齐核对（C-11）、附录（外围接缝/深挖 calcite/永久排除/可简化沉淀）。切课详情以 wayfinder 地图各决策票的 resolution 为准（[issue #1](https://github.com/XianReallyHot-ZZH/Lesson-Ignite2/issues/1) 及其 16 张子票）。
 
-| 章节 | 主题 | 引入的概念簇 | 里程碑（tracer bullet） |
+| 章 | 主题 | 课数 | 章 tracer 里程碑 |
 |---|---|---|---|
-| 0 | 构建骨架与 Ignition 生命周期 | 5 模块 reactor 空壳（provided+shade 协议）、`Ignition`/`IgniteKernal`/配置/logger、最小 kernal 逐课生长 | 单节点 `start()` 成功 |
-| 1 | 单节点缓存（PARTITIONED+ATOMIC 退化形态） | Cache API 子集、存储接缝（entry 层 × CacheDataStore）、on-heap 简化实现、扫描/过期 | 单机 put/get/scan |
-| 2 | SPI 抽象 + Discovery | SPI 框架、`TcpDiscoverySpi` 简化 | 2 节点互相发现 |
-| 3 | 通信 | `GridIoManager`/NIO 简化（内部简化白名单）、消息 marshaller | 跨节点消息往返 |
-| 4 | Affinity 与分布 | `RendezvousAffinityFunction`、partitioned/replicated、rebalance | 数据按分区正确落位 |
-| 5 | near cache（独立课） | 读加速、reader 登记、primary 捎带回传 | near 命中率可观测 |
-| 6 | 事务 | 隐式微事务、悲观 2PC | 跨节点事务提交/回滚 |
-| 7 | 持久化 | page memory、WAL、checkpoint、baseline；替换存储接缝实现 | 重启后数据存活 |
-| 8 | SQL 之 H2 课弧 | H2 集成、索引、分布式查询/join（H2 1.4.197） | 跨节点 SQL 查询 |
-| 9 | SQL 之 calcite 课弧 | `QueryEngine` SPI、集成层、引擎切换/hint（Calcite 库为黑盒依赖） | 同一 SQL 双引擎跑通 + hint 切换 |
-| 10 | 计算与服务 | `IgniteCompute`/MR、data streamer、services | 分布式 MR 作业跑通 |
-| 11 | 部署子系统 | `GridDeploymentManager`、peer class loading 管道、`UriDeploymentSpi`（file/http） | p2p 模式下 compute 派单类到达远端 |
-| 12 | 收尾 | binary marshaller 完整化、thin client 协议两端（真/复刻 client 均连复刻节点）、metrics 最小实现 | 真 thin client 连复刻节点 put/get |
+| 0 | 构建骨架与 Ignition 生命周期 | 4 | `Ignition.start()` + JdkMarshaller 往返 |
+| 1 | 单节点缓存（退化形态 + 存储接缝） | 4 | 单机 put/get/scan |
+| 2 | SPI + Discovery（ring 全保真 + 多播） | 7 | 2 节点互发现；愈合三不变量 |
+| 3 | 通信（NIO 全保真 + binary v1） | 10+1 选 | 跨节点消息往返；任意对象过线 |
+| 4 | Affinity 与 rebalance | 8 | 分区正确落位含备份 |
+| 5 | near cache | 2 | 零额外消息的捎带更新 |
+| 6 | 事务（3 隔离×2 并发 + 恢复 + store） | 8 | 悲观 2PC 提交/回滚；kill 共识 |
+| 7 | 持久化（含 compaction/增量快照/historical 补课） | 12 | 重启数据存活（6 kill 注入矩阵） |
+| 8 | H2 SQL 课弧（DML/DDL/join/治理+Lucene） | 8 | 跨节点 SELECT/UPDATE |
+| 9 | 事件与消息（fog 毕业弧） | 4 | kill primary：CQ 不丢不重 |
+| 10 | calcite 课弧（库为黑盒，灰区 9 条全保真化） | 6 | 双引擎一致 + hint 切换 |
+| 11 | 计算与服务（compute/services/streamer/datastructures） | 12 | MR 作业；kill worker failover |
+| 12 | 部署子系统（双 store/映射协议/UriDeployment） | 5 | p2p 派单类到达远端 |
+| 13 | 客户端形态与收尾（thick/thin/binary 完整化） | 7 | 官方 thin client 连复刻节点 |
 
-附录（不设课）：外围 17 模块接缝清单、schedule、maven resolver、control 工具接缝（命令本体在 core，随课弧自然生长）、深挖 calcite 扩展路线（课后可选开发）。
-
-骨架 v0 → v1 的变化依据：ADR [0001](docs/adr/0001-replication-scope-and-compatibility.md)（范围/互操作）、[0003](docs/adr/0003-single-evolving-codebase-5-module-reactor.md)（reactor 形态）、[0004](docs/adr/0004-interface-faithful-implementation-progressive.md)（阶段 1 重定义、near cache 拆分）；research 02（内核闭包）、03（LOCAL 已删/ATOMIC 分叉）、04（双引擎）。
+（编号重排：事件弧插为章 9，原 9/10/11/12 顺移为 10/11/12/13。）
 
 ## 5. 范围决策（已全部钉死，2026-10-03 grill，16 问；详见 docs/adr/）
 
@@ -93,12 +92,16 @@
 | 5 | 产物形态 | 单一演进代码库 + 5 模块 reactor + `lesson-XX.YY` git tag；lessons/ 只放讲义 | 0003 |
 | 6 | 工程基线 | Java 11 / Maven / JUnit 4 / H2 1.4.197，依赖版本跟随 vendor pom；消息序列化代码手写 | 0002 |
 | 7 | 保真策略 | 接口忠实、实现渐进；存储接缝从第一课保留 | 0004 |
-| 8 | 互操作边界 | 复刻集群同构、线协议内部可简化；唯一例外 = thin client 应用层协议（双端实现，真 Ignite 与复刻 thin client 均须能连复刻节点） | 0001 |
+| 8 | 互操作边界 | 复刻集群同构；线协议与线程模型**全保真**（ADR 0005 修订，2026-10-04）；唯一例外 = thin client 应用层协议（双端实现，真 Ignite 与复刻 thin client 均须能连复刻节点） | 0001、0005 |
 | 9 | 运维面 | metrics/JMX 最小实现、不设专门课；control 工具进附录（命令本体在 core `internal/management`，随课弧自然生长） | 0001 |
 | 10 | 代码注释 | 每复刻类头 vendor 锚点 + 中文教学注释；javadoc 英文 | — |
 | 11 | calcite 深度 | 集成层复刻（库为黑盒依赖）；深挖（planner rules/metadata）留作课后可选扩展 | 0001 |
 
-## 6. Research 底座（Phase A 4 份已验收 + grill 补研 3 份）
+## 6. Research 底座（16 份全部验收）
+
+- **Phase A 四份**：`01-startup-path.md`、`02-module-dependency-graph.md`、`03-data-plane-put-path.md`、`04-persistence-sql.md`。
+- **grill 补研三份**（2026-10-03）：`05-compute-services.md`、`06-calcite-integration.md`、`07-deployment-p2p.md`（验收记录见 §8）。
+- **wayfinder 期补研九份**（2026-10-04，各章切票证据，均验收 9–12 处抽查）：`08-communication-nio.md`（章 3 全保真，带宽限流/心跳两假设修正）、`09-discovery-ring.md`（章 2 重切+多播，四个旧名证伪）、`10-affinity-exchange-rebalance.md`（章 4，late 不可关闭等四纠错）、`11-near-cache.md`（章 5，无 withNearCache）、`12-transactions.md`（章 6，3 隔离值/savepoint 不存在/tx mapping 不存 utility cache）、`13-persistence-internals.md`（章 7，BPlusTree 并发四件套+四个名证伪）、`14-sql-dml-ddl-join.md`（章 8，DML=SELECT 改写+CAS、LazyQueryList 证伪、事件归属）、`15-events-continuous-messaging.md`（事件弧，四纠错）、`16-client-binary-thin.md`（章 13，metadata 三通道+compactFooter 落定）。
 
 - **已验收**（引用 100% 核验，可直接信任）：`01-startup-path.md`、`02-module-dependency-graph.md`、`03-data-plane-put-path.md`、`04-persistence-sql.md`。
 - **grill 补研**（2026-10-03 决定，覆盖 compute/calcite/部署三个原盲区）：
@@ -125,7 +128,7 @@
 - [x] 验收 research #5 `docs/research/05-compute-services.md`（2026-10-03：9 处抽查引用全部核验为真）
 - [x] 验收 research #6 `docs/research/06-calcite-integration.md`（2026-10-03：10 处抽查引用全部核验为真）
 - [x] 验收 research #7 `docs/research/07-deployment-p2p.md`（2026-10-03：9 处抽查引用全部核验为真）——**research 底座 01–07 全绿，Phase B 情报就绪**
-- [ ] Phase B：`/wayfinder`（地图已建：[#1 课程地图](https://github.com/XianReallyHot-ZZH/Lesson-Ignite2/issues/1) + 15 张子票 + 28 条依赖边；frontier = [marshaller 演进主线票 #2](https://github.com/XianReallyHot-ZZH/Lesson-Ignite2/issues/2)；每次 `/wayfinder` 调用解一票，同窗口进行到 frontier 清空）
+- [x] Phase B：`/wayfinder`（**完成，2026-10-04**：[地图 #1](https://github.com/XianReallyHot-ZZH/Lesson-Ignite2/issues/1) 16/16 票关闭 + 9 份补研验收；产出 [docs/course-map-v1.md](docs/course-map-v1.md)——97 主课+1 选做、章间 DAG、kernal 终态对齐、附录四节）
 - [ ] Phase B：`/to-spec`（课程 spec）
 - [ ] Phase B：`/to-tickets`（课程 ticket DAG，blocking edges = 先修关系）
 - [ ] Phase C：Lesson 01（由 tickets 生成后回填逐课清单）

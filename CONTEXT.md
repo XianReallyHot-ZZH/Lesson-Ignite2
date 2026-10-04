@@ -23,7 +23,7 @@ _Avoid_: 存储抽象（泛称）、DAO
 _Avoid_: 逐行翻译、自由发挥
 
 **互操作边界（Interop Boundary）**:
-复刻集群同构——replica 节点只与 replica 节点组网，线协议内部可简化；唯一例外是 thin client 应用层协议（真 Ignite 与复刻的 thin client 都须能连复刻节点）。
+复刻集群同构——replica 节点只与 replica 节点组网；线协议与线程模型全保真（ADR 0005）；唯一例外是 thin client 应用层协议（真 Ignite 与复刻的 thin client 都须能连复刻节点）。
 _Avoid_: 协议兼容、兼容模式
 
 **部署子系统（Deployment Subsystem）**:

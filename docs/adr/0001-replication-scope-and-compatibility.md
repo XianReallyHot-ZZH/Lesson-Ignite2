@@ -1,5 +1,7 @@
 # 0001 · 复刻范围与兼容等级
 
+> 注：本文"Considered Options"中"线协议内部允许简化"子句已被 [ADR 0005](0005-wire-protocol-full-fidelity.md) 修订为全保真（2026-10-04）。
+
 课程复刻范围 = **内核闭包**（commons / binary-api / binary-impl / unsafe / core，即 shade 进 ignite-core 的 5 模块）+ **indexing**（H2 SQL）+ **calcite 集成层**（Apache Calcite 库作黑盒依赖，只复刻 Ignite 侧集成代码）+ **部署子系统**（GridDeploymentManager + peer class loading 管道 + UriDeploymentSpi 的 file/http resolver）。platforms（.NET/C++）与外围 17 模块显式排除（附录只记接缝、不设课）；实验性 MVCC 不在范围内——2.18 源码已将其整体删除（全 core 无 `MvccMode`）。兼容等级 = **包名 API 级**（`org.apache.ignite.*` 原包原类名、签名尽量一致，未复刻 API 显式 `UnsupportedOperationException`），以**测试级准绳**验收（能编译运行改写自 Ignite 的测试子集）。
 
 ## Considered Options
