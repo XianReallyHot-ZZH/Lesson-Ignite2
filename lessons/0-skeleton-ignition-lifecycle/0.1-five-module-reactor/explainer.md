@@ -23,34 +23,9 @@
 
 ## 2. 2.18 的模块拆分：一张依赖图看懂
 
-复刻的 reactor 镜像 vendor 的内核闭包（research 02 §5："被 shade 进 ignite-core jar 的那 5 个模块"）。箭头方向 `A --> B` = A 依赖 B；虚线 = `provided` scope：
+复刻的 reactor 镜像 vendor 的内核闭包（research 02 §5："被 shade 进 ignite-core jar 的那 5 个模块"）。箭头方向 `A → B` = A 依赖 B；虚线 = `provided` scope（矢量版见 [assets/module-dependency.svg](assets/module-dependency.svg)）：
 
-```mermaid
-flowchart BT
-    commons["ignite-commons<br/>异常体系 / future / JSR-166<br/>（依赖图叶子，零内部依赖）"]
-
-    unsafe["ignite-grid-unsafe<br/>sun.misc.Unsafe 封装<br/>(13 个文件的小模块)"]
-    binaryapi["ignite-binary-api<br/>BinaryObject 公开 API<br/>+ marshaller 接口"]
-    binaryimpl["ignite-binary-impl<br/>Binary marshaller 实现<br/>(Lesson 0.1 为空壳)"]
-
-    unsafe -. provided .-> commons
-    binaryapi -. provided .-> commons
-    binaryimpl -. provided .-> binaryapi
-    binaryimpl -. provided .-> commons
-    binaryimpl -. provided .-> unsafe
-
-    core["ignite-core<br/>内核主体：Ignition / IgniteKernal /<br/>42 个 processor / SPI / thin client<br/>（vendor 4241 个 .java）"]
-
-    core --> commons
-    core --> binaryapi
-    core --> binaryimpl
-    core --> unsafe
-
-    classDef kernel fill:#cde5ff,stroke:#0366d6,stroke-width:2px
-    classDef base fill:#e1f3d8,stroke:#4a7c2f
-    class core kernel
-    class commons,unsafe,binaryapi,binaryimpl base
-```
+![内核闭包五模块依赖图](assets/module-dependency.png)
 
 每个模块一句话职责（与 vendor 源码包结构一一对应）：
 
@@ -91,33 +66,9 @@ core → 底座：compile （为了 shade 能拉进来）
 
 ### 3.4 从构建看数据流
 
-```mermaid
-flowchart TD
-    subgraph reactor["mvn install（reactor 按 DAG 排序）"]
-        B1["1. ignite-parent / parent-internal / bom<br/>(构建基建三层)"]
-        B2["2. ignite-commons → install"]
-        B3["3. ignite-binary-api → install"]
-        B4["4. ignite-grid-unsafe → install"]
-        B5["5. ignite-binary-impl → install"]
-        B6["6. ignite-core<br/>compile: 四底座类可见<br/>test: CrossModuleSmokeTest"]
-        B7["7. shade (package 阶段)<br/>四底座 class 合并进 ignite-core.jar"]
-    end
+![mvn install：reactor 构建与 shade 数据流](assets/build-shade-flow.png)
 
-    B1 --> B2 --> B3 --> B5
-    B2 --> B4 --> B5
-    B5 --> B6 --> B7
-
-    subgraph artifacts["~/.m2/repository/dev/lessonignite/"]
-        A1["ignite-commons.jar<br/>(独立 jar，供轻量复用)"]
-        A2["ignite-core.jar (fat)<br/>(含四底座的全部类)"]
-    end
-
-    B2 -. install .-> A1
-    B7 -. install .-> A2
-
-    style B7 fill:#fff2c9,stroke:#b8860b
-    style A2 fill:#fff2c9,stroke:#b8860b
-```
+（矢量版见 [assets/build-shade-flow.svg](assets/build-shade-flow.svg)；实线 = 主线构建顺序，虚线 = 并行底座与 install 落仓。）
 
 注意一个实证过的坑：**单独 `mvn -pl modules/core test` 会从本地仓库解析旧版 commons**（上次 install 时的产物）。跨模块改动后要么从根构建，要么 `mvn -pl modules/core -am test` 让 reactor 把依赖模块一起构建——本课实施时就踩过一次（详见 §6 红绿记录）。
 
@@ -125,26 +76,9 @@ flowchart TD
 
 vendor 用四个"无代码 pom"组织 39 个模块，复刻镜像了同样的三层（只是规模缩小到 8 个模块）：
 
-```mermaid
-flowchart TD
-    root["lesson-ignite（根 aggregator）<br/>只列 &lt;modules&gt;，不写版本"]
-    parent["ignite-parent<br/>版本属性 / Java 11 / JUnit 4.12<br/>(全模块继承的测试基线)"]
-    pinternal["ignite-parent-internal<br/>import ignite-bom"]
-    bom["ignite-bom<br/>&lt;dependencyManagement&gt; 收口<br/>全部内部 artifact 版本"]
-    mods["内部模块 commons / unsafe /<br/>binary-api / binary-impl / core"]
+![构建基建三层与版本收口链](assets/build-infra-layers.png)
 
-    root -->|parent| parent
-    root -->|modules| pinternal
-    root -->|modules| bom
-    root -->|modules| mods
-    pinternal -->|parent| parent
-    bom -->|parent| parent
-    mods -->|parent| pinternal
-    pinternal -. scope=import .-> bom
-
-    style bom fill:#e1f3d8,stroke:#4a7c2f
-    style parent fill:#cde5ff,stroke:#0366d6
-```
+（矢量版见 [assets/build-infra-layers.svg](assets/build-infra-layers.svg)；加粗边 `scope=import` 是版本收口的关键一跳。）
 
 各层职责（对照 vendor 同名 pom）：
 
