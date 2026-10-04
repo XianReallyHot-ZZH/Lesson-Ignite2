@@ -31,6 +31,9 @@ package org.apache.ignite.binary;
  * @see BinaryIdMapper
  */
 public interface BinaryNameMapper {
+    // 【教学】binary 类型标识映射链的第一环：NameMapper 先把类名/字段名"整形"
+    // （如下划线化），IdMapper 再把整形后的名字算成 typeId/fieldId。这对接口
+    // 将被 3.10/13 课的 BinaryMarshaller 消费——跨节点 typeId 一致性的起点。
     /**
      * Gets type clsName.
      *

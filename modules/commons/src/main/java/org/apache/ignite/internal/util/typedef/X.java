@@ -34,6 +34,8 @@ import org.jetbrains.annotations.Nullable;
  * should only be used for static constants and static utility functions.
  */
 public final class X {
+    // 【教学】vendor 的 X 是"全局作用域"静态工具入口（命名习惯来自 Scala 的 Predef），
+    // 全库静态导入使用；复刻按课生长，本课只需要 hasCause/cause 两个函数。
     /**
      * Checks if passed in {@code 'Throwable'} has given class in {@code 'cause'} hierarchy <b>including</b> that
      * throwable itself.
@@ -81,6 +83,9 @@ public final class X {
      * @param types Candidate types.
      * @return First throwable meets test condition or {@code null} if none has matched.
      */
+    // 【教学】遍历序：先自身、再 cause 链（深度优先）、最后 suppressed；
+    // IdentityHashMap 按对象身份防环——异常的 cause 链理论上可以成环（vendor 同款防御）。
+
     @Nullable private static Throwable searchForCause(Throwable t, Set<Throwable> dejaVu, Class<?>... types) {
         for (Class<?> c : types)
             if (c != null && c.isAssignableFrom(t.getClass()))

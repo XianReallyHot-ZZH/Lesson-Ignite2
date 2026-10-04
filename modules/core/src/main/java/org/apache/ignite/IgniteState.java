@@ -28,6 +28,9 @@ import org.jetbrains.annotations.Nullable;
  * method.
  */
 public enum IgniteState {
+    // 【教学】这是 Ignition "工厂级"状态机，不是单个节点的状态：0.2 课的 grids 注册表
+    // 与 0.3 课的 gateway 状态机都以它为准绳。vendor 的分层事实：gw.setState(STARTED)
+    // 先于 discovery join（research 01 §3.7）——STARTED 是实例级语义，不含组网完成。
     /**
      * Grid factory started.
      */
@@ -37,6 +40,9 @@ public enum IgniteState {
      * Grid factory stopped.
      */
     STOPPED,
+
+    // 【教学】后两个终态只在网络分段（章 2 segmentation 判定）与致命失败时出现，
+    // 0.1 只需占位；fromOrdinal 的 byte 参数是线协议友好设计（单字节传输状态）。
 
     /**
      * Grid factory stopped due to network segmentation issues.

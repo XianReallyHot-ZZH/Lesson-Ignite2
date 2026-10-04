@@ -29,6 +29,11 @@ import org.jetbrains.annotations.Nullable;
  * within Grid.
  */
 public class IgniteCheckedException extends Exception {
+    // 【教学】Ignite 的异常体系是"成对"的：本类是 checked 版，用于内核内部路径，
+    // 强制调用方显式处理；其 unchecked 兄弟 IgniteException 留给公共 API 层（vendor 同在
+    // commons，随 0.2 课需要引入）。0.2 课的 Ignition.start(cfg) 签名将 throws 本类——
+    // 它是后续所有课程错误路径的通用语言。
+
     /** */
     private static final long serialVersionUID = 0L;
 
@@ -87,6 +92,10 @@ public class IgniteCheckedException extends Exception {
      * @return {@code True} if one of the causing exception is an instance of passed in classes,
      *      {@code false} otherwise.
      */
+    // 【教学】hasCause/getCause(Class) 是内核里最高频的异常查询面：拿到一个深层包装的
+    // 异常后问"里面到底有没有某类错误"。遍历序（自身→cause 链→suppressed）与防环语义
+    // 都在 X.searchForCause，测试已逐条锁定。
+
     @SafeVarargs
     public final boolean hasCause(@Nullable Class<? extends Throwable>... cls) {
         return X.hasCause(this, cls);
@@ -102,6 +111,9 @@ public class IgniteCheckedException extends Exception {
     @Nullable public <T extends Throwable> T getCause(@Nullable Class<T> cls) {
         return X.cause(this, cls);
     }
+
+    // 【教学】vendor 刻意输出 "class 类名: 消息"（注意带 class 前缀）——
+    // 错误日志里据此快速识别异常类型，测试锁定了该格式。
 
     /** {@inheritDoc} */
     @Override public String toString() {

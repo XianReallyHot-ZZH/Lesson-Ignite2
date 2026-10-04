@@ -48,6 +48,10 @@ import sun.misc.Unsafe;
  * </p>
  */
 public abstract class GridUnsafe {
+    // 【教学】为什么要把 Unsafe 封装成独立模块：Ignite 的 offheap 页池（章 7 持久化课弧）
+    // 直接操作堆外内存，把所有 sun.misc.Unsafe 用法收口到这一个类，便于集中审计与
+    // JDK 升级时替换实现——这就是 2.18 把它拆成 ignite-grid-unsafe 小模块的全部理由。
+
     /** */
     public static final ByteOrder NATIVE_BYTE_ORDER = ByteOrder.nativeOrder();
 
@@ -56,6 +60,10 @@ public abstract class GridUnsafe {
 
     /** Big endian. */
     public static final boolean BIG_ENDIAN = ByteOrder.nativeOrder() == ByteOrder.BIG_ENDIAN;
+
+    // 【教学】两段获取路径：Unsafe.getUnsafe() 只信任引导类加载器加载的调用方，
+    // 用户代码必然抛 SecurityException，于是落回反射读取 theUnsafe 静态字段——
+    // vendor 同款兜底。测试通过类加载触发本方法来验证整条链路可用。
 
     /**
      * @return Instance of Unsafe class.
