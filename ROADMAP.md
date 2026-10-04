@@ -129,6 +129,6 @@
 - [x] 验收 research #6 `docs/research/06-calcite-integration.md`（2026-10-03：10 处抽查引用全部核验为真）
 - [x] 验收 research #7 `docs/research/07-deployment-p2p.md`（2026-10-03：9 处抽查引用全部核验为真）——**research 底座 01–07 全绿，Phase B 情报就绪**
 - [x] Phase B：`/wayfinder`（**完成，2026-10-04**：[地图 #1](https://github.com/XianReallyHot-ZZH/Lesson-Ignite2/issues/1) 16/16 票关闭 + 9 份补研验收；产出 [docs/course-map-v1.md](docs/course-map-v1.md)——97 主课+1 选做、章间 DAG、kernal 终态对齐、附录四节）
-- [ ] Phase B：`/to-spec`（课程 spec）
-- [ ] Phase B：`/to-tickets`（课程 ticket DAG，blocking edges = 先修关系）
+- [x] Phase B：`/to-spec`（**完成，2026-10-04**：[课程 spec · #27](https://github.com/XianReallyHot-ZZH/Lesson-Ignite2/issues/27)，已打 `ready-for-agent`——问题/方案/92 条用户故事/实现与测试决策（四接缝 S1–S4 已确认）/范围外；输入=course-map-v1+16 决议票+16 调研）
+- [x] Phase B：`/to-tickets`（**完成，2026-10-04**：98 张课票 #28–#125 全部 `ready-for-agent`、挂为 [spec #27](https://github.com/XianReallyHot-ZZH/Lesson-Ignite2/issues/27) sub-issue、107 条原生 blocking 边；frontier = [Lesson 0.1 · #28](https://github.com/XianReallyHot-ZZH/Lesson-Ignite2/issues/28)）——**Phase B 四步全部完成，进入 Phase C**
 - [ ] Phase C：Lesson 01（由 tickets 生成后回填逐课清单）
