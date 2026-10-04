@@ -111,7 +111,7 @@
 
 ## 7. 课程目录约定（grill 定稿）
 
-- `lessons/XX-topic/`（章节）+ `XX.YY-name/`（课）；每课目录含 `explainer.md`、验收测试来源说明与 `assets/` 配图目录（PNG 引用进讲义 + SVG 矢量版，2026-10-04 起，archify 产出）；
+- `lessons/XX-topic/`（章节）+ `XX.YY-name/`（课）；每课目录含 `explainer.md`、验收测试来源说明与 `assets/` 配图目录（PNG 引用进讲义 + HTML 可交互版，2026-10-04 起，archify 产出；不保存 SVG）；
 - **讲义（explainer.md）是每课的硬性收尾产物**：实施完成（代码 + 测试全绿）后产出，中文、面向学习者、**配图充分**（mermaid 架构图/时序图/流程图），以降低学习难度为第一目标（2026-10-03 wayfinder 建图时用户追加）；
 - 复刻代码本体在仓库根的 5 模块 reactor 中持续演进（ADR 0003），每课完成打 tag `lesson-XX.YY`，`git diff` 相邻 tag 即两课教学增量；
 - 每个复刻类头部标注 vendor 锚点（`// 对应 vendor: .../Xxx.java`）；注释（javadoc 与行注）一律中文，由 vendor 英文原文翻译（2026-10-04 修订）；

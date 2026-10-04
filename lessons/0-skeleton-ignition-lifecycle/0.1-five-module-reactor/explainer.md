@@ -23,7 +23,7 @@
 
 ## 2. 2.18 的模块拆分：一张依赖图看懂
 
-复刻的 reactor 镜像 vendor 的内核闭包（research 02 §5："被 shade 进 ignite-core jar 的那 5 个模块"）。箭头方向 `A → B` = A 依赖 B；虚线 = `provided` scope（矢量版见 [assets/module-dependency.svg](assets/module-dependency.svg)）：
+复刻的 reactor 镜像 vendor 的内核闭包（research 02 §5："被 shade 进 ignite-core jar 的那 5 个模块"）。箭头方向 `A → B` = A 依赖 B；虚线 = `provided` scope（可交互版：缩放/主题切换/聚焦见 [assets/module-dependency.html](assets/module-dependency.html)）：
 
 ![内核闭包五模块依赖图](assets/module-dependency.png)
 
@@ -68,7 +68,7 @@ core → 底座：compile （为了 shade 能拉进来）
 
 ![mvn install：reactor 构建与 shade 数据流](assets/build-shade-flow.png)
 
-（矢量版见 [assets/build-shade-flow.svg](assets/build-shade-flow.svg)；实线 = 主线构建顺序，虚线 = 并行底座与 install 落仓。）
+（可交互版见 [assets/build-shade-flow.html](assets/build-shade-flow.html)；实线 = 主线构建顺序，虚线 = 并行底座与 install 落仓。）
 
 注意一个实证过的坑：**单独 `mvn -pl modules/core test` 会从本地仓库解析旧版 commons**（上次 install 时的产物）。跨模块改动后要么从根构建，要么 `mvn -pl modules/core -am test` 让 reactor 把依赖模块一起构建——本课实施时就踩过一次（详见 §6 红绿记录）。
 
@@ -78,7 +78,7 @@ vendor 用四个"无代码 pom"组织 39 个模块，复刻镜像了同样的三
 
 ![构建基建三层与版本收口链](assets/build-infra-layers.png)
 
-（矢量版见 [assets/build-infra-layers.svg](assets/build-infra-layers.svg)；加粗边 `scope=import` 是版本收口的关键一跳。）
+（可交互版见 [assets/build-infra-layers.html](assets/build-infra-layers.html)；加粗边 `scope=import` 是版本收口的关键一跳。）
 
 各层职责（对照 vendor 同名 pom）：
 
