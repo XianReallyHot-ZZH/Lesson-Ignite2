@@ -25,95 +25,79 @@ import org.apache.ignite.internal.util.typedef.X;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * General grid exception. This exception is used to indicate any error condition
- * within Grid.
+ * Grid 通用异常。用于指示 Grid 内部的任何错误状态。
  */
 public class IgniteCheckedException extends Exception {
-    // 【教学】Ignite 的异常体系是"成对"的：本类是 checked 版，用于内核内部路径，
-    // 强制调用方显式处理；其 unchecked 兄弟 IgniteException 留给公共 API 层（vendor 同在
-    // commons，随 0.2 课需要引入）。0.2 课的 Ignition.start(cfg) 签名将 throws 本类——
-    // 它是后续所有课程错误路径的通用语言。
-
     /** */
     private static final long serialVersionUID = 0L;
 
     /**
-     * Create empty exception.
+     * 创建空异常。
      */
     public IgniteCheckedException() {
-        // No-op.
+        // 空实现。
     }
 
     /**
-     * Creates new exception with given error message.
+     * 以给定错误消息创建新异常。
      *
-     * @param msg Error message.
+     * @param msg 错误消息。
      */
     public IgniteCheckedException(String msg) {
         super(msg);
     }
 
     /**
-     * Creates new grid exception with given throwable as a cause and
-     * source of error message.
+     * 以给定 Throwable 作为 cause 及错误消息来源创建新 grid 异常。
      *
-     * @param cause Non-null throwable cause.
+     * @param cause 非空 Throwable cause。
      */
     public IgniteCheckedException(Throwable cause) {
         this(cause.getMessage(), cause);
     }
 
     /**
-     * Creates new exception with given error message and optional nested exception.
+     * 以给定错误消息与可选嵌套异常创建新异常。
      *
-     * @param msg Error message.
-     * @param cause Optional nested exception (can be {@code null}).
-     * @param writableStackTrace whether or not the stack trace should
-     *                           be writable
+     * @param msg 错误消息。
+     * @param cause 可选嵌套异常（可为 {@code null}）。
+     * @param writableStackTrace 堆栈是否可写。
      */
     public IgniteCheckedException(String msg, @Nullable Throwable cause, boolean writableStackTrace) {
         super(msg, cause, true, writableStackTrace);
     }
 
     /**
-     * Creates new exception with given error message and optional nested exception.
+     * 以给定错误消息与可选嵌套异常创建新异常。
      *
-     * @param msg Error message.
-     * @param cause Optional nested exception (can be {@code null}).
+     * @param msg 错误消息。
+     * @param cause 可选嵌套异常（可为 {@code null}）。
      */
     public IgniteCheckedException(String msg, @Nullable Throwable cause) {
         super(msg, cause);
     }
 
     /**
-     * Checks if this exception has given class in {@code 'cause'} hierarchy.
+     * 检查本异常的 {@code 'cause'} 层级中是否含给定类。
      *
-     * @param cls Cause classes to check (if {@code null} or empty, {@code false} is returned).
-     * @return {@code True} if one of the causing exception is an instance of passed in classes,
-     *      {@code false} otherwise.
+     * @param cls 待检查的 cause 类（若为 {@code null} 或空，返回 {@code false}）。
+     * @return 若某个 cause 异常是传入类的实例则返回 {@code true}，否则 {@code false}。
      */
-    // 【教学】hasCause/getCause(Class) 是内核里最高频的异常查询面：拿到一个深层包装的
-    // 异常后问"里面到底有没有某类错误"。遍历序（自身→cause 链→suppressed）与防环语义
-    // 都在 X.searchForCause，测试已逐条锁定。
-
     @SafeVarargs
     public final boolean hasCause(@Nullable Class<? extends Throwable>... cls) {
         return X.hasCause(this, cls);
     }
 
     /**
-     * Gets first exception of given class from {@code 'cause'} hierarchy if any.
+     * 从 {@code 'cause'} 层级中取得第一个给定类的异常（若有）。
      *
-     * @param cls Cause class to get cause (if {@code null}, {@code null} is returned).
-     * @param <T> Type of the exception cause.
-     * @return First causing exception of passed in class, {@code null} otherwise.
+     * @param cls 要获取的 cause 类（若为 {@code null}，返回 {@code null}）。
+     * @param <T> 异常 cause 的类型。
+     * @return 传入类的第一个 cause 异常，否则 {@code null}。
      */
     @Nullable public <T extends Throwable> T getCause(@Nullable Class<T> cls) {
         return X.cause(this, cls);
     }
-
-    // 【教学】vendor 刻意输出 "class 类名: 消息"（注意带 class 前缀）——
-    // 错误日志里据此快速识别异常类型，测试锁定了该格式。
 
     /** {@inheritDoc} */
     @Override public String toString() {

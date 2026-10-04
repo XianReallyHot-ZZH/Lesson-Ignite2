@@ -21,32 +21,28 @@
 package org.apache.ignite.binary;
 
 /**
- * Maps type and field names to different names. Prepares class/type names
- * and field names before pass them to {@link BinaryIdMapper}.
+ * 把类型名与字段名映射为不同的名字。在把类/类型名与字段名传给 {@link BinaryIdMapper}
+ * 之前先做预处理。
  * <p>
- * Binary name mapper can be configured for all binary objects via
- * {@code BinaryConfiguration#getNameMapper()} method,
- * or for a specific binary type via {@code BinaryTypeConfiguration#getNameMapper()} method.
+ * 名称映射器可通过 {@code BinaryConfiguration#getNameMapper()} 为全部 binary 对象配置，
+ * 或通过 {@code BinaryTypeConfiguration#getNameMapper()} 为特定 binary 类型配置。
  *
  * @see BinaryIdMapper
  */
 public interface BinaryNameMapper {
-    // 【教学】binary 类型标识映射链的第一环：NameMapper 先把类名/字段名"整形"
-    // （如下划线化），IdMapper 再把整形后的名字算成 typeId/fieldId。这对接口
-    // 将被 3.10/13 课的 BinaryMarshaller 消费——跨节点 typeId 一致性的起点。
     /**
-     * Gets type clsName.
+     * 获取类型名。
      *
-     * @param clsName Class came
-     * @return Type name.
+     * @param clsName 传入的类名。
+     * @return 类型名。
      */
     String typeName(String clsName);
 
     /**
-     * Gets field name.
+     * 获取字段名。
      *
-     * @param fieldName Field name.
-     * @return Field name.
+     * @param fieldName 字段名。
+     * @return 字段名。
      */
     String fieldName(String fieldName);
 }

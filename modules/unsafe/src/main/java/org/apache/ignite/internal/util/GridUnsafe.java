@@ -30,43 +30,34 @@ import java.security.PrivilegedExceptionAction;
 import sun.misc.Unsafe;
 
 /**
- * <p>Wrapper for {@link sun.misc.Unsafe} class.</p>
+ * <p>{@link sun.misc.Unsafe} 类的封装。</p>
  *
  * <p>
- * The following statements for memory access operations  are true:
+ * 对内存访问操作，以下陈述成立：
  * <ul>
- * <li>All {@code putXxx(long addr, xxx val)}, {@code getXxx(long addr)}, {@code putXxx(byte[] arr, long off, xxx val)},
- * {@code getXxx(byte[] arr, long off)} and corresponding methods with {@code LE} suffix are alignment aware
- * and can be safely used with unaligned pointers.</li>
- * <li>All {@code putXxxField(Object obj, long fieldOff, xxx val)} and {@code getXxxField(Object obj, long fieldOff)}
- * methods are not alignment aware and can't be safely used with unaligned pointers. This methods can be safely used
- * for object field values access because all object fields addresses are aligned.</li>
- * <li>All {@code putXxxLE(...)} and {@code getXxxLE(...)} methods assumes that byte order is fixed as little-endian
- * while native byte order is big-endian. So it is client code responsibility to check native byte order before
- * invoking of this methods.</li>
+ * <li>所有 {@code putXxx(long addr, xxx val)}、{@code getXxx(long addr)}、
+ * {@code putXxx(byte[] arr, long off, xxx val)}、{@code getXxx(byte[] arr, long off)}
+ * 及带 {@code LE} 后缀的对应方法都是对齐感知的，可安全用于未对齐指针。</li>
+ * <li>所有 {@code putXxxField(Object obj, long fieldOff, xxx val)} 与
+ * {@code getXxxField(Object obj, long fieldOff)} 方法非对齐感知，不能安全用于未对齐指针；
+ * 但用于对象字段值的访问是安全的，因为对象字段地址总是对齐的。</li>
+ * <li>所有 {@code putXxxLE(...)} 与 {@code getXxxLE(...)} 方法假定字节序固定为小端，
+ * 而原生字节序为大端；调用方有责任在调用这些方法前检查原生字节序。</li>
  * </ul>
  * </p>
  */
 public abstract class GridUnsafe {
-    // 【教学】为什么要把 Unsafe 封装成独立模块：Ignite 的 offheap 页池（章 7 持久化课弧）
-    // 直接操作堆外内存，把所有 sun.misc.Unsafe 用法收口到这一个类，便于集中审计与
-    // JDK 升级时替换实现——这就是 2.18 把它拆成 ignite-grid-unsafe 小模块的全部理由。
-
     /** */
     public static final ByteOrder NATIVE_BYTE_ORDER = ByteOrder.nativeOrder();
 
-    /** Unsafe. */
+    /** Unsafe 实例。 */
     private static final Unsafe UNSAFE = unsafe();
 
-    /** Big endian. */
+    /** 是否大端。 */
     public static final boolean BIG_ENDIAN = ByteOrder.nativeOrder() == ByteOrder.BIG_ENDIAN;
 
-    // 【教学】两段获取路径：Unsafe.getUnsafe() 只信任引导类加载器加载的调用方，
-    // 用户代码必然抛 SecurityException，于是落回反射读取 theUnsafe 静态字段——
-    // vendor 同款兜底。测试通过类加载触发本方法来验证整条链路可用。
-
     /**
-     * @return Instance of Unsafe class.
+     * @return Unsafe 类实例。
      */
     private static Unsafe unsafe() {
         try {

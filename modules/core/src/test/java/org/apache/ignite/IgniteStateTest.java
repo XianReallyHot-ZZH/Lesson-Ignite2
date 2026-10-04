@@ -11,10 +11,10 @@ import static org.junit.Assert.assertNull;
 import org.junit.Test;
 
 /**
- * Tests for {@link IgniteState} enumeration values and ordinal lookup.
+ * {@link IgniteState} 枚举值与序数查找的测试。
  */
 public class IgniteStateTest {
-    /** Enumeration order mirrors vendor 2.18.0 exactly. */
+    /** 枚举序与 vendor 2.18.0 完全一致。 */
     @Test
     public void enumOrderMirrorsVendor() {
         IgniteState[] expected = {
@@ -30,7 +30,7 @@ public class IgniteStateTest {
             assertEquals(expected[i], IgniteState.values()[i]);
     }
 
-    /** fromOrdinal maps ordinals back to values. */
+    /** fromOrdinal 把序数映射回枚举值。 */
     @Test
     public void fromOrdinalMapsBackToValues() {
         assertEquals(IgniteState.STARTED, IgniteState.fromOrdinal((byte)0));
@@ -39,7 +39,7 @@ public class IgniteStateTest {
         assertEquals(IgniteState.STOPPED_ON_FAILURE, IgniteState.fromOrdinal((byte)3));
     }
 
-    /** fromOrdinal returns null for out-of-range ordinals. */
+    /** fromOrdinal 对越界序数返回 null。 */
     @Test
     public void fromOrdinalReturnsNullOutOfRange() {
         assertNull(IgniteState.fromOrdinal((byte)-1));

@@ -28,22 +28,17 @@ import java.util.Set;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Defines global scope.
+ * 定义全局作用域。
  * <p>
- * Contains often used utility functions allowing to cut down on code bloat. Note that this
- * should only be used for static constants and static utility functions.
+ * 收纳常用工具函数以削减代码膨胀。注意：只应用于静态常量与静态工具函数。
  */
 public final class X {
-    // 【教学】vendor 的 X 是"全局作用域"静态工具入口（命名习惯来自 Scala 的 Predef），
-    // 全库静态导入使用；复刻按课生长，本课只需要 hasCause/cause 两个函数。
     /**
-     * Checks if passed in {@code 'Throwable'} has given class in {@code 'cause'} hierarchy <b>including</b> that
-     * throwable itself.
+     * 检查传入的 {@code 'Throwable'} 的 {@code 'cause'} 层级中是否含给定类，<b>包含</b>该 Throwable 自身。
      *
-     * @param t Throwable to check (if {@code null}, {@code false} is returned).
-     * @param cls Cause classes to check (if {@code null} or empty, {@code false} is returned).
-     * @return {@code True} if one of the causing exception is an instance of passed in classes, {@code false}
-     * otherwise.
+     * @param t 待检查的 Throwable（若为 {@code null}，返回 {@code false}）。
+     * @param cls 待检查的 cause 类（若为 {@code null} 或空，返回 {@code false}）。
+     * @return 若某个 cause 异常是传入类的实例则返回 {@code true}，否则 {@code false}。
      */
     public static boolean hasCause(@Nullable Throwable t, @Nullable Class<?>... cls) {
         if (t == null || cls == null || cls.length == 0)
@@ -55,12 +50,12 @@ public final class X {
     }
 
     /**
-     * Gets first exception of given class from {@code 'cause'} hierarchy if any.
+     * 从 {@code 'cause'} 层级中取得第一个给定类的异常（若有）。
      *
-     * @param t Throwable to check (if {@code null}, {@code null} is returned).
-     * @param cls Cause class to get cause (if {@code null}, {@code null} is returned).
-     * @param <T> Type of the exception cause.
-     * @return First causing exception of passed in class, {@code null} otherwise.
+     * @param t 待检查的 Throwable（若为 {@code null}，返回 {@code null}）。
+     * @param cls 要获取的 cause 类（若为 {@code null}，返回 {@code null}）。
+     * @param <T> 异常 cause 的类型。
+     * @return 传入类的第一个 cause 异常，否则 {@code null}。
      */
     @Nullable public static <T extends Throwable> T cause(@Nullable Throwable t, @Nullable Class<T> cls) {
         if (t == null || cls == null)
@@ -75,17 +70,14 @@ public final class X {
     }
 
     /**
-     * Traverses tree of {@link Throwable} to find first node assignable from any of given types.
-     * Function is aware of possible circular references through tracking of tested objects.
+     * 遍历 {@link Throwable} 树，寻找第一个可被给定类型之一赋值的节点。
+     * 通过跟踪已测试对象感知可能存在的循环引用。
      *
-     * @param t Throwable.
-     * @param dejaVu Set of throwable for tracking already tested objects.
-     * @param types Candidate types.
-     * @return First throwable meets test condition or {@code null} if none has matched.
+     * @param t Throwable。
+     * @param dejaVu 已测试对象的跟踪集合。
+     * @param types 候选类型。
+     * @return 第一个满足条件的 Throwable，若无匹配则为 {@code null}。
      */
-    // 【教学】遍历序：先自身、再 cause 链（深度优先）、最后 suppressed；
-    // IdentityHashMap 按对象身份防环——异常的 cause 链理论上可以成环（vendor 同款防御）。
-
     @Nullable private static Throwable searchForCause(Throwable t, Set<Throwable> dejaVu, Class<?>... types) {
         for (Class<?> c : types)
             if (c != null && c.isAssignableFrom(t.getClass()))

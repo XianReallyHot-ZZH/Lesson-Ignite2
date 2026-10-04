@@ -23,49 +23,41 @@ package org.apache.ignite;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Possible states of {@link org.apache.ignite.Ignition}. You can register a listener for
- * state change notifications via {@link org.apache.ignite.Ignition#addListener(IgnitionListener)}
- * method.
+ * {@link org.apache.ignite.Ignition} 的可能状态。可通过
+ * {@link org.apache.ignite.Ignition#addListener(IgnitionListener)} 方法注册状态变更通知监听器。
  */
 public enum IgniteState {
-    // 【教学】这是 Ignition "工厂级"状态机，不是单个节点的状态：0.2 课的 grids 注册表
-    // 与 0.3 课的 gateway 状态机都以它为准绳。vendor 的分层事实：gw.setState(STARTED)
-    // 先于 discovery join（research 01 §3.7）——STARTED 是实例级语义，不含组网完成。
     /**
-     * Grid factory started.
+     * Grid 工厂已启动。
      */
     STARTED,
 
     /**
-     * Grid factory stopped.
+     * Grid 工厂已停止。
      */
     STOPPED,
 
-    // 【教学】后两个终态只在网络分段（章 2 segmentation 判定）与致命失败时出现，
-    // 0.1 只需占位；fromOrdinal 的 byte 参数是线协议友好设计（单字节传输状态）。
-
     /**
-     * Grid factory stopped due to network segmentation issues.
+     * Grid 工厂因网络分段问题而停止。
      * <p>
-     * Notification on this state will be fired only when segmentation policy is
-     * set to {@code STOP} or {@code RESTART_JVM} and node is stopped from internals
-     * of Ignite after segment becomes invalid.
+     * 仅当分段策略设为 {@code STOP} 或 {@code RESTART_JVM}、且节点在分段失效后
+     * 被 Ignite 内部停止时，才会触发此状态的通知。
      */
     STOPPED_ON_SEGMENTATION,
 
     /**
-     * Grid factory stopped due to a critical failure.
+     * Grid 工厂因致命失败而停止。
      */
     STOPPED_ON_FAILURE;
 
-    /** Enumerated values. */
+    /** 枚举值数组。 */
     private static final IgniteState[] VALS = values();
 
     /**
-     * Efficiently gets enumerated value from its ordinal.
+     * 按序数高效获取枚举值。
      *
-     * @param ord Ordinal value.
-     * @return Enumerated value.
+     * @param ord 序数值。
+     * @return 枚举值。
      */
     @Nullable public static IgniteState fromOrdinal(byte ord) {
         return ord >= 0 && ord < VALS.length ? VALS[ord] : null;

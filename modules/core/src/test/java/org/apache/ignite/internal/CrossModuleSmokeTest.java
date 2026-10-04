@@ -14,10 +14,10 @@ import org.apache.ignite.IgniteState;
 import org.junit.Test;
 
 /**
- * Cross-module smoke test: commons classes are visible from core.
+ * 跨模块冒烟测试：commons 的类在 core 可见。
  */
 public class CrossModuleSmokeTest {
-    /** Commons exception type is usable from core at compile and run time. */
+    /** commons 的异常类型在 core 的编译期与运行期均可用。 */
     @Test
     public void commonsExceptionVisibleFromCore() {
         IgniteCheckedException e = new IgniteCheckedException("cross-module",
@@ -27,7 +27,7 @@ public class CrossModuleSmokeTest {
         assertTrue(e.hasCause(IllegalStateException.class));
     }
 
-    /** Core's own public enum is loadable next to commons types. */
+    /** core 自己的公共枚举可与 commons 类型一同加载。 */
     @Test
     public void coreEnumLoadableNextToCommonsTypes() {
         assertEquals(IgniteState.STOPPED, IgniteState.fromOrdinal((byte)1));

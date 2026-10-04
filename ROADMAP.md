@@ -94,7 +94,7 @@
 | 7 | 保真策略 | 接口忠实、实现渐进；存储接缝从第一课保留 | 0004 |
 | 8 | 互操作边界 | 复刻集群同构；线协议与线程模型**全保真**（ADR 0005 修订，2026-10-04）；唯一例外 = thin client 应用层协议（双端实现，真 Ignite 与复刻 thin client 均须能连复刻节点） | 0001、0005 |
 | 9 | 运维面 | metrics/JMX 最小实现、不设专门课；control 工具进附录（命令本体在 core `internal/management`，随课弧自然生长） | 0001 |
-| 10 | 代码注释 | 每复刻类头 vendor 锚点 + 中文教学注释；javadoc 英文 | — |
+| 10 | 代码注释 | 每复刻类头 vendor 锚点；注释（javadoc 与行注）一律中文，由 vendor 英文原文翻译（2026-10-04 用户修订，原"javadoc 英文"作废） | — |
 | 11 | calcite 深度 | 集成层复刻（库为黑盒依赖）；深挖（planner rules/metadata）留作课后可选扩展 | 0001 |
 
 ## 6. Research 底座（16 份全部验收）
@@ -114,7 +114,7 @@
 - `lessons/XX-topic/`（章节）+ `XX.YY-name/`（课）；每课目录只含 `explainer.md` 与验收测试来源说明；
 - **讲义（explainer.md）是每课的硬性收尾产物**：实施完成（代码 + 测试全绿）后产出，中文、面向学习者、**配图充分**（mermaid 架构图/时序图/流程图），以降低学习难度为第一目标（2026-10-03 wayfinder 建图时用户追加）；
 - 复刻代码本体在仓库根的 5 模块 reactor 中持续演进（ADR 0003），每课完成打 tag `lesson-XX.YY`，`git diff` 相邻 tag 即两课教学增量；
-- 每个复刻类头部标注 vendor 锚点（`// 对应 vendor: .../Xxx.java`）、中文教学注释、英文 javadoc；
+- 每个复刻类头部标注 vendor 锚点（`// 对应 vendor: .../Xxx.java`）；注释（javadoc 与行注）一律中文，由 vendor 英文原文翻译（2026-10-04 修订）；
 - ~~problem/solution 目录约定~~ 废除——与单一演进代码库冲突（ADR 0003 的 Considered Options）。
 
 ## 8. 进度追踪
