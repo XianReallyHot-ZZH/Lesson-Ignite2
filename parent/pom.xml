@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  全局 parent POM：版本属性、编译基线（Java 11）、JUnit 4 基线。
+  对应 vendor: vendors/ignite/parent/pom.xml（ignite-parent）。
+  差异（教学取舍，见 lessons/0.1 讲义）：
+    - 版本字面量 2.18.0 直接写死，不复刻 ${revision} + flatten-maven-plugin 的 CI-friendly 版本机制；
+    - 坐标 groupId 用 dev.lessonignite 与 Apache 官方区分（Java 包名仍为 org.apache.ignite.*）；
+    - 仅保留内核闭包用得到的属性与插件，随课生长。
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>dev.lessonignite</groupId>
+    <artifactId>ignite-parent</artifactId>
+    <version>2.18.0</version>
+    <packaging>pom</packaging>
+
+    <properties>
+        <!-- ADR 0002：Java 11（vendor 用 source/target=11；release 同时锁 API 面） -->
+        <maven.compiler.release>11</maven.compiler.release>
+
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!-- 无测试的模块（如空壳 binary-impl）不失败，vendor 同名属性同值 -->
+        <failIfNoTests>false</failIfNoTests>
+
+        <!-- Dependency versions（跟随 vendor parent pom） -->
+        <javax.cache.version>1.0.0</javax.cache.version>
+        <jetbrains.annotations.version>16.0.3</jetbrains.annotations.version>
+
+        <!-- Maven plugins versions（跟随 vendor parent pom） -->
+        <surefire.version>3.1.2</surefire.version>
+    </properties>
+
+    <!-- JUnit 4 基线（vendor 锁 4.12，全模块继承，ADR 0002） -->
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${surefire.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>

@@ -31,4 +31,8 @@ target/
 
 # IDE
 .idea/
+.vscode/
 *.iml
+.classpath
+.project
+.settings/

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  基础库模块：异常体系、future、并发容器、工具类。零内部依赖（依赖图叶子）。
+  对应 vendor: vendors/ignite/modules/commons/pom.xml（ignite-commons）。
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>dev.lessonignite</groupId>
+        <artifactId>ignite-parent-internal</artifactId>
+        <version>2.18.0</version>
+        <relativePath>../../parent-internal/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>ignite-commons</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>${jetbrains.annotations.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.cache</groupId>
+            <artifactId>cache-api</artifactId>
+            <version>${javax.cache.version}</version>
+        </dependency>
+    </dependencies>
+</project>

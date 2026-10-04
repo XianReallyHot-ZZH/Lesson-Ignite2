@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Binary marshaller 实现模块：BinaryReaderExImpl / BinaryWriterExImpl / BinaryThreadLocalContext。
+  对应 vendor: vendors/ignite/modules/binary/impl/pom.xml（ignite-binary-impl）。
+  provided+shade 协议：对 commons / binary-api / grid-unsafe 的依赖均为 provided，
+  最终被 shade 进 ignite-core fat jar。
+  Lesson 0.1 为空壳：实现随章 3（3.10 BinaryMarshaller 真格式）与章 13（完整化）填充。
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>dev.lessonignite</groupId>
+        <artifactId>ignite-parent-internal</artifactId>
+        <version>2.18.0</version>
+        <relativePath>../../../parent-internal/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>ignite-binary-impl</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ignite-commons</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ignite-binary-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ignite-grid-unsafe</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>${jetbrains.annotations.version}</version>
+        </dependency>
+    </dependencies>
+</project>

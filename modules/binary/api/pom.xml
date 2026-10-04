@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Binary 公开 API 模块：BinaryObject / BinaryReader/Writer / marshaller 接口 / CacheObject 抽象。
+  对应 vendor: vendors/ignite/modules/binary/api/pom.xml（ignite-binary-api）。
+  provided+shade 协议：对 commons 的依赖为 provided，最终被 shade 进 ignite-core fat jar。
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>dev.lessonignite</groupId>
+        <artifactId>ignite-parent-internal</artifactId>
+        <version>2.18.0</version>
+        <relativePath>../../../parent-internal/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>ignite-binary-api</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ignite-commons</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>${jetbrains.annotations.version}</version>
+        </dependency>
+    </dependencies>
+</project>

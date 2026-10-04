@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  BOM：集中声明全部发布 artifact 的版本，parent-internal 以 scope=import 引入。
+  对应 vendor: vendors/ignite/modules/bom/pom.xml（34 个 artifact；复刻先收内核闭包 5 个，
+  indexing/calcite/urideploy 随课弧追加）。
+  差异：vendor 用 flatten-maven-plugin（flattenMode=bom）解析 ${revision}，复刻版本为字面量，无需 flatten。
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>dev.lessonignite</groupId>
+        <artifactId>ignite-parent</artifactId>
+        <version>2.18.0</version>
+        <relativePath>../../parent/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>ignite-bom</artifactId>
+    <packaging>pom</packaging>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>ignite-commons</artifactId>
+                <version>2.18.0</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>ignite-grid-unsafe</artifactId>
+                <version>2.18.0</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>ignite-binary-api</artifactId>
+                <version>2.18.0</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>ignite-binary-impl</artifactId>
+                <version>2.18.0</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>ignite-core</artifactId>
+                <version>2.18.0</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+</project>

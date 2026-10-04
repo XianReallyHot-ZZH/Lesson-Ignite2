@@ -131,4 +131,5 @@
 - [x] Phase B：`/wayfinder`（**完成，2026-10-04**：[地图 #1](https://github.com/XianReallyHot-ZZH/Lesson-Ignite2/issues/1) 16/16 票关闭 + 9 份补研验收；产出 [docs/course-map-v1.md](docs/course-map-v1.md)——97 主课+1 选做、章间 DAG、kernal 终态对齐、附录四节）
 - [x] Phase B：`/to-spec`（**完成，2026-10-04**：[课程 spec · #27](https://github.com/XianReallyHot-ZZH/Lesson-Ignite2/issues/27)，已打 `ready-for-agent`——问题/方案/92 条用户故事/实现与测试决策（四接缝 S1–S4 已确认）/范围外；输入=course-map-v1+16 决议票+16 调研）
 - [x] Phase B：`/to-tickets`（**完成，2026-10-04**：98 张课票 #28–#125 全部 `ready-for-agent`、挂为 [spec #27](https://github.com/XianReallyHot-ZZH/Lesson-Ignite2/issues/27) sub-issue、107 条原生 blocking 边；frontier = [Lesson 0.1 · #28](https://github.com/XianReallyHot-ZZH/Lesson-Ignite2/issues/28)）——**Phase B 四步全部完成，进入 Phase C**
-- [ ] Phase C：Lesson 01（由 tickets 生成后回填逐课清单）
+- [x] Phase C：Lesson 0.1 · 构建骨架（2026-10-04，[#28](https://github.com/XianReallyHot-ZZH/Lesson-Ignite2/issues/28)：五模块 reactor（provided+shade）+ parent/parent-internal/bom + JUnit4 基线；锚点类 IgniteCheckedException/X/GridUnsafe/BinaryNameMapper/IgniteState；tracer=mvn install 全绿（17/17）+ commons→core 冒烟；Maven 坐标 groupId=dev.lessonignite（包名仍 org.apache.ignite.*）；tag `lesson-0.1`）
+- [ ] Phase C：Lesson 0.2 → 13.7 逐课推进（课票 #29–#125，frontier 由 issue 依赖图决定）

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  内核主体模块：Ignition/IgniteKernal、processor、SPI、discovery/communication、thin client。
+  对应 vendor: vendors/ignite/modules/core/pom.xml（ignite-core，4241 个 .java）。
+  provided+shade 协议：以 compile 依赖四个底座模块，再以 maven-shade-plugin 把它们合并回
+  单个 ignite-core fat jar（vendor §4.1：发布产物只有一个 ignite-core）。
+  差异：vendor 另有 codegen2 注解处理器（provided）与 classes 生成、test-jar、发布期 antrun——
+  复刻手写消息序列化（ADR 0002），其余随课需要再加。
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>dev.lessonignite</groupId>
+        <artifactId>ignite-parent-internal</artifactId>
+        <version>2.18.0</version>
+        <relativePath>../../parent-internal/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>ignite-core</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>javax.cache</groupId>
+            <artifactId>cache-api</artifactId>
+            <version>${javax.cache.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>${jetbrains.annotations.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ignite-commons</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ignite-binary-api</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ignite-binary-impl</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>ignite-grid-unsafe</artifactId>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- 对应 vendor modules/core/pom.xml 的 maven-shade-plugin（3.6.0）配置：
+                 四个底座模块 shade 回 ignite-core fat jar。 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <shadedArtifactAttached>false</shadedArtifactAttached>
+                            <artifactSet>
+                                <includes>
+                                    <include>${groupId}:ignite-commons</include>
+                                    <include>${groupId}:ignite-binary-api</include>
+                                    <include>${groupId}:ignite-binary-impl</include>
+                                    <include>${groupId}:ignite-grid-unsafe</include>
+                                </includes>
+                            </artifactSet>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

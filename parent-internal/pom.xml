@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  内部模块的 parent：通过 import ignite-bom 收口内部依赖版本。
+  对应 vendor: vendors/ignite/parent-internal/pom.xml（ignite-parent-internal）。
+  vendor 注释原意：仅供 Ignite 源码树内部模块作 parent，永不发布（扩展工程只 parent 到 ignite-parent）。
+  差异：vendor 同时 import log4j-bom，复刻暂无 log4j 依赖，随需要再加。
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>dev.lessonignite</groupId>
+        <artifactId>ignite-parent</artifactId>
+        <version>2.18.0</version>
+        <relativePath>../parent/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>ignite-parent-internal</artifactId>
+    <packaging>pom</packaging>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>dev.lessonignite</groupId>
+                <artifactId>ignite-bom</artifactId>
+                <version>2.18.0</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+</project>
