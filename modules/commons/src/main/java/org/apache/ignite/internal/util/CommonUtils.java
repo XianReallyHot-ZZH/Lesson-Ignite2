@@ -24,9 +24,14 @@
 
 package org.apache.ignite.internal.util;
 
+import java.util.Map;
+import java.util.ServiceLoader;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import org.apache.ignite.IgniteCheckedException;
 import org.apache.ignite.IgniteCommonsSystemProperties;
 import org.apache.ignite.IgniteException;
+import org.apache.ignite.lang.IgnitePredicate;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -35,6 +40,23 @@ import org.jetbrains.annotations.Nullable;
 public abstract class CommonUtils {
     /** 缓存的 Ignite 主目录（vendor 以 GridTuple 缓存，这里直接持引用）。 */
     private static volatile String ggHome;
+
+    /** "未设置实例名"哨兵（引用判等专用，勿用 equals 比较——vendor 原注释同此警告）。 */
+    public static final String LOC_IGNITE_NAME_EMPTY = new String();
+
+    /** 当前线程的 Ignite 实例名（marshaller 序列化路径读取，区分多实例同 JVM）。 */
+    private static final ThreadLocal<String> LOC_IGNITE_NAME = new ThreadLocal<String>() {
+        @Override protected String initialValue() {
+            return LOC_IGNITE_NAME_EMPTY;
+        }
+    };
+
+    /** 类缓存：loader → (类名 → Class)。vendor 同结构（forName 的 useCache 路径）。 */
+    private static final ConcurrentMap<ClassLoader, ConcurrentMap<String, Class>> classCache =
+        new ConcurrentHashMap<>();
+
+    /** Ignite 自身的类加载器（forName 的 loader 兜底）。 */
+    private static final ClassLoader gridClassLoader = CommonUtils.class.getClassLoader();
 
     static {
         // 环境变量/系统属性只解析一次，与 vendor 的惰性单次解析对齐。
@@ -84,5 +106,128 @@ public abstract class CommonUtils {
      */
     public static IgniteException convertException(IgniteCheckedException e) {
         return new IgniteException(e.getMessage(), e);
+    }
+
+    /**
+     * 取当前线程的 Ignite 实例名。
+     *
+     * @return 实例名（未设置为空串哨兵 {@link #LOC_IGNITE_NAME_EMPTY}）。
+     */
+    @Nullable public static String getCurrentIgniteName() {
+        return LOC_IGNITE_NAME.get();
+    }
+
+    /**
+     * 判断实例名是否已设置（引用判等——哨兵是专用对象，equals 不可用）。
+     *
+     * @param name 待检名称。
+     * @return 已设置返回 {@code true}。
+     */
+    @SuppressWarnings("StringEquality")
+    public static boolean isCurrentIgniteNameSet(@Nullable String name) {
+        return name != LOC_IGNITE_NAME_EMPTY;
+    }
+
+    /**
+     * 设置当前线程的 Ignite 实例名（marshaller 在每次 marshal/unmarshal 前调用，
+     * 使序列化路径能感知"当前为哪个实例工作"）。
+     *
+     * @param newName 新实例名。
+     * @return 旧值（供 finally 恢复）。
+     */
+    @SuppressWarnings("StringEquality")
+    @Nullable public static String setCurrentIgniteName(@Nullable String newName) {
+        String oldName = LOC_IGNITE_NAME.get();
+
+        if (oldName != newName)
+            LOC_IGNITE_NAME.set(newName);
+
+        return oldName;
+    }
+
+    /**
+     * 恢复旧实例名（与 {@link #setCurrentIgniteName} 成对使用）。
+     *
+     * @param oldName 旧实例名。
+     * @param curName 当前实例名（相同则无操作）。
+     */
+    @SuppressWarnings("StringEquality")
+    public static void restoreOldIgniteName(@Nullable String oldName, @Nullable String curName) {
+        if (oldName != curName)
+            LOC_IGNITE_NAME.set(oldName);
+    }
+
+    /**
+     * 按类名解析 Class，支持类名过滤器与结果缓存。
+     * <p>
+     * JDK 反序列化路径（{@code JdkMarshallerObjectInputStream.resolveClass}）经此入口，
+     * 保证"必须用 {@code Class.forName} 而非 {@code loader.loadClass}"（数组类在某些场景下
+     * loadClass 会抛莫名 CNFE——vendor 原注释）。
+     *
+     * @param clsName 类名。
+     * @param ldr 类加载器（{@code null} 用 Ignite 自身 loader）。
+     * @param clsFilter 类名过滤器（非 {@code null} 且拒绝时抛 CNFE，防反序列化攻击面）。
+     * @param useCache 是否使用类缓存。
+     * @return 解析出的 Class。
+     * @throws ClassNotFoundException 类不存在或被过滤器拒绝时抛出。
+     */
+    public static Class<?> forName(
+        String clsName,
+        @Nullable ClassLoader ldr,
+        @Nullable IgnitePredicate<String> clsFilter,
+        boolean useCache
+    ) throws ClassNotFoundException {
+        assert clsName != null;
+
+        if (!useCache)
+            return Class.forName(clsName, true, ldr != null ? ldr : gridClassLoader);
+
+        if (ldr == null)
+            ldr = gridClassLoader;
+
+        ConcurrentMap<String, Class> ldrMap = classCache.get(ldr);
+
+        if (ldrMap == null) {
+            ConcurrentMap<String, Class> old = classCache.putIfAbsent(ldr, ldrMap = new ConcurrentHashMap<>());
+
+            if (old != null)
+                ldrMap = old;
+        }
+
+        Class cls = ldrMap.get(clsName);
+
+        if (cls == null) {
+            if (clsFilter != null && !clsFilter.apply(clsName))
+                throw new ClassNotFoundException("Deserialization of class " + clsName + " is disallowed.");
+
+            cls = Class.forName(clsName, true, ldr);
+
+            Class old = ldrMap.putIfAbsent(clsName, cls);
+
+            if (old != null)
+                cls = old;
+        }
+
+        return cls;
+    }
+
+    /**
+     * 加载 JDK ServiceLoader 服务实现（binary 模块 api/impl 拆分后，
+     * {@code Marshallers} 工厂经此发现 impl 模块的实现）。
+     *
+     * @param svc 服务接口。
+     * @return 服务实现迭代器。
+     */
+    public static <S> Iterable<S> loadService(Class<S> svc) {
+        return ServiceLoader.load(svc, gridClassLoader);
+    }
+
+    /**
+     * 取当前毫秒时间（所有"节点时间"统一入口，方便测试注入时钟——vendor 同点）。
+     *
+     * @return 当前毫秒数。
+     */
+    public static long currentTimeMillis() {
+        return System.currentTimeMillis();
     }
 }

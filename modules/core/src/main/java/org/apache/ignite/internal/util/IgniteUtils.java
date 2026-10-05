@@ -190,4 +190,63 @@ public abstract class IgniteUtils extends CommonUtils {
     static boolean isEmpty(@Nullable String s) {
         return s == null || s.isEmpty();
     }
+
+    /**
+     * 以给定名创建线程（daemon 属性与 vendor 一致取非 daemon——后台 worker 需在
+     * 线程 dump 可见且阻止 JVM 提前退出）。
+     *
+     * @param r 任务体。
+     * @param name 线程名。
+     * @return 新线程（未启动）。
+     */
+    public static Thread newThread(Runnable r, String name) {
+        Thread t = new Thread(r, name);
+
+        t.setUncaughtExceptionHandler((thread, e) ->
+            error(null, "Uncaught exception in thread: " + thread.getName(), e));
+
+        return t;
+    }
+
+    /**
+     * 记录错误日志。
+     *
+     * @param log 日志（可为 {@code null}）。
+     * @param msg 消息。
+     * @param e 异常。
+     */
+    public static void error(@Nullable IgniteLogger log, String msg, @Nullable Throwable e) {
+        if (log == null) {
+            System.err.println(msg);
+
+            if (e != null)
+                e.printStackTrace(System.err);
+        }
+        else
+            log.error(msg, e);
+    }
+
+    /**
+     * 立即关闭执行器（vendor U.shutdownNow 的最小形态：跳过 runnable 清单告警）。
+     *
+     * @param owner 归属类（诊断用）。
+     * @param exec 执行器（可为 {@code null}）。
+     * @param log 日志。
+     */
+    public static void shutdownNow(Class<?> owner, @Nullable java.util.concurrent.ExecutorService exec,
+        @Nullable IgniteLogger log) {
+        if (exec != null) {
+            exec.shutdownNow();
+
+            try {
+                exec.awaitTermination(Long.MAX_VALUE, java.util.concurrent.TimeUnit.MILLISECONDS);
+            }
+            catch (InterruptedException ignored) {
+                exec.shutdownNow();
+
+                // 保留中断标志。
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
 }

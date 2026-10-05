@@ -52,7 +52,10 @@ import org.apache.ignite.IgnitionListener;
 import org.apache.ignite.ShutdownPolicy;
 import org.apache.ignite.configuration.IgniteConfiguration;
 import org.apache.ignite.internal.util.GridConcurrentHashSet;
+import org.apache.ignite.internal.util.TimeBag;
+import org.apache.ignite.internal.util.lang.GridAbsClosure;
 import org.apache.ignite.internal.util.typedef.T2;
+import org.apache.ignite.internal.worker.WorkersRegistry;
 import org.apache.ignite.internal.util.typedef.X;
 import org.apache.ignite.internal.util.typedef.G;
 import org.apache.ignite.internal.util.typedef.internal.A;
@@ -787,8 +790,9 @@ public class IgnitionEx {
 
         /**
          * 实例级启动编排。vendor 版本在此（按序）：SPI 多实例注解校验（章 2）、
-         * WorkersRegistry/OOM handler（0.3+ 故障处理）、factory MBean 注册（13.7）、
-         * kernal 全签名 start（0.3）、JVM shutdown hook 安装（0.4）。
+         * factory MBean 注册（13.7）、kernal 全签名 start（0.3 已接）、
+         * JVM shutdown hook 安装（0.4）。
+         * 0.3 已接：WorkersRegistry 传 kernal（真实 OOM handler 属 FailureProcessor 课）。
          *
          * @param startCtx 启动上下文。
          * @param cfg 定稿配置。
@@ -809,7 +813,19 @@ public class IgnitionEx {
                 // 先赋值再 start：让生命周期监听者能在启动期看到 grid。
                 grid = grid0;
 
-                grid0.start(cfg);
+                grid0.start(
+                    cfg,
+                    // 启动失败回调：vendor 在此置 factory 级失败标志（FailureProcessor 课接入）。
+                    new GridAbsClosure() {
+                        @Override public void apply() {
+                            // 0.3 最小形态：日志已在 kernal 侧输出。
+                        }
+                    },
+                    new WorkersRegistry(),
+                    // 线程池 OOM 处理器：vendor 传入真实 OOM handler（随 FailureProcessor 课）。
+                    null,
+                    new TimeBag(true)
+                );
 
                 state = STARTED;
 

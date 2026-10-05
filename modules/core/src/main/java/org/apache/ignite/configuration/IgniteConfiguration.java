@@ -38,6 +38,15 @@ import org.jetbrains.annotations.Nullable;
  * 用户手里的原配置不被改动。
  */
 public class IgniteConfiguration {
+    /** 可用处理器数（池大小默认值的基数）。 */
+    public static final int AVAILABLE_PROC_CNT = Runtime.getRuntime().availableProcessors();
+
+    /** 默认公共池线程数（vendor：max(8, CPU 数)）。 */
+    public static final int DFLT_PUBLIC_THREAD_CNT = Math.max(8, AVAILABLE_PROC_CNT);
+
+    /** 默认线程空闲保活时间（毫秒）。 */
+    public static final long DFLT_THREAD_KEEP_ALIVE_TIME = 60_000L;
+
     /** 实例名（{@code null} 表示默认无名实例）。 */
     private String igniteInstanceName;
 
@@ -58,6 +67,9 @@ public class IgniteConfiguration {
 
     /** 用户属性（随节点属性广播）。 */
     private Map<String, ?> userAttrs;
+
+    /** 公共线程池大小。 */
+    private int pubPoolSize = DFLT_PUBLIC_THREAD_CNT;
 
     /**
      * 创建默认配置。
@@ -80,6 +92,7 @@ public class IgniteConfiguration {
         igniteWorkDir = cfg.getWorkDirectory();
         log = cfg.getGridLogger();
         nodeId = cfg.getNodeId();
+        pubPoolSize = cfg.getPublicThreadPoolSize();
         userAttrs = cfg.getUserAttributes();
     }
 
@@ -230,7 +243,27 @@ public class IgniteConfiguration {
         return this;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * 取公共线程池大小。
+     *
+     * @return 公共池大小。
+     */
+    public int getPublicThreadPoolSize() {
+        return pubPoolSize;
+    }
+
+    /**
+     * 设置公共线程池大小。
+     *
+     * @param pubPoolSize 公共池大小（须大于 0）。
+     * @return {@code this}（链式调用）。
+     */
+    public IgniteConfiguration setPublicThreadPoolSize(int pubPoolSize) {
+        this.pubPoolSize = pubPoolSize;
+
+        return this;
+    }
+
     @Override public String toString() {
         return "IgniteConfiguration [igniteInstanceName=" + igniteInstanceName
             + ", nodeId=" + nodeId

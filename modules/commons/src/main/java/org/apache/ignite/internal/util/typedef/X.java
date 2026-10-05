@@ -104,4 +104,13 @@ public final class X {
 
         return null;
     }
+
+    /**
+     * 打印消息到标准输出（诊断信息用——vendor X.println）。
+     *
+     * @param msg 消息。
+     */
+    public static void println(String msg) {
+        System.out.println(msg);
+    }
 }
